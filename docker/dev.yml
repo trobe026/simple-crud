@@ -1,0 +1,23 @@
+version: '3'
+
+networks:
+  devnet:
+
+services:
+  node:
+    container_name: node
+    image: node:12.5-stretch
+    networks:
+      devnet:
+    ports:
+      - "9000:9000"  
+
+  mongo:
+    container_name: mongo
+    image: 4.4.6-bionic
+    networks:
+      devnet:
+    aliases:
+      - mongo
+    ports:
+      - "27017:27017"
