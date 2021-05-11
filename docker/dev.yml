@@ -17,7 +17,7 @@ services:
     image: 4.4.6-bionic
     networks:
       devnet:
-    aliases:
-      - mongo
+        aliases:
+          - "mongo"
     ports:
       - "27017:27017"
