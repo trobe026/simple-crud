@@ -1,47 +1,23 @@
+const app = require('./app');
+
+const Task = require('./models/Task');
+const User = require('./models/User');
+
 const mongoose = require('mongoose');
-const express = require('express');
-const Schema = mongoose.Schema;
+const passport = require('passport');
 
 // Connect to the Mongo DB
 mongoose.Promise = Promise;
 mongoose.connect('mongodb://mongo:27017');
 
-const TaskSchema = new Schema({
-    title: {
-        type: String
-    },
-    text: {
-        type: String,
-        required: [true, 'A task is required']
-    }
-});
-
-const Task = mongoose.model('Task', TaskSchema);
-
-const UserSchema = new Schema({
-    user: {
-        type: String
-    },
-    password: {
-        type: String,
-        required: [true, 'A password is required']
-    },
-    tasks: [
-        {
-            type: Schema.Types.ObjectId,
-            ref: 'Task'
-        }
-    ]
-});
-
-const User = mongoose.model('User', UserSchema);
-
-const app = express();
-app.use(express.json());
+// start app
 const PORT = 9000;
 app.listen(PORT, function() {
     console.log('App now listening at localhost:' + PORT);
 });
+
+
+// TASK ROUTES
 
 // health check
 app.get('/health', function (req, res) {
@@ -62,7 +38,7 @@ app.get('/tasks/:id', async function(req, res) {
 // create a task and link to the user
 app.post('/tasks/:id', async function(req, res) {
     let { body } = req;
-    let task = await Task.create(body).then(() => User.findOneAndUpdate({ _id: req.params.id }));
+    let task = await Task.create(body);
     res.json(task);
 });
 
@@ -78,3 +54,38 @@ app.delete('/tasks/:id', async function(req, res) {
     let task = await Task.deleteOne({ _id: req.params.id });
     res.json(task);
 });
+
+// USER ROUTES
+
+// create a user
+app.get('/signup', async function (req, res) {
+    let { body } = req;
+    let user = await User.create( { _id: req.params.id }, body);
+    res.json(user);
+});
+
+// update user
+app.put('/users', async function(req, res) {
+    let { body } = req;
+    let user = await User.findByIdAndUpdate( { _id: req.params.id }, body);
+    res.json(user);
+});
+
+// get user
+app.get('/users', async function(req, res) {
+    let user = await User.findById( { _id: req.params.id });
+    res.json(user);
+});
+
+// get users
+app.get('/users', async function(req, res) {
+    let user = await User.find({});
+    res.json(user);
+});
+
+// delete user
+app.delete('/users', async function(req, res) {
+    let user = await User.deleteOne( { _id: req.params.id });
+    res.json(user);
+});
+
