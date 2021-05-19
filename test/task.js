@@ -1,7 +1,6 @@
-const mongoose = require('mongoose');
-
 const chai = require('chai');
 const expect = chai.expect;
+// eslint-disable-next-line no-unused-vars
 const should = chai.should();
 
 const chaiHttp = require('chai-http');
