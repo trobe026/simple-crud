@@ -5,8 +5,12 @@ networks:
 
 services:
   node:
+    command: sleep infinity
     container_name: node
     image: node:12.5-stretch
+    volumes:
+      - ../:/code
+      - /code/node_modules
     networks:
       devnet:
     ports:
@@ -14,7 +18,7 @@ services:
 
   mongo:
     container_name: mongo
-    image: 4.4.6-bionic
+    image: mongo:4.4.6-bionic
     networks:
       devnet:
         aliases:
