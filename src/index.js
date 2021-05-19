@@ -8,7 +8,7 @@ const passport = require('passport');
 
 // Connect to the Mongo DB
 mongoose.Promise = Promise;
-mongoose.connect('mongodb://mongo:27017');
+mongoose.connect('mongodb://mongo:27017', { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true  });
 
 // start app
 const PORT = 9000;
@@ -32,26 +32,35 @@ app.get('/tasks', async function(req, res) {
 
 app.get('/tasks/:id', async function(req, res) {
     let task = await Task.findById({ _id: req.params.id });
+    if (!task) {
+        res.json({ error: 'no task exists for id: ' + req.params.id });
+    }
     res.json(task);
 });
 
 // create a task and link to the user
 app.post('/tasks/:id', async function(req, res) {
     let { body } = req;
-    let task = await Task.create(body);
+    let task = await Task.create( { _id: req.params.id, title: body.title, text: body.text });
     res.json(task);
 });
 
 // update a task
 app.put('/tasks/:id', async function(req, res) {
     let { body } = req;
-    let task = await Task.findByIdAndUpdate( { _id: req.params.id, body });
+    let task = await Task.findByIdAndUpdate( { _id: req.params.id }, body, { useFindAndModify: false, new: true });
     res.json(task);
 });
 
 // delete a task
 app.delete('/tasks/:id', async function(req, res) {
     let task = await Task.deleteOne({ _id: req.params.id });
+    res.json(task);
+});
+
+// delete all tasks
+app.delete('/tasks/', async function(req, res) {
+    let task = await Task.deleteMany({});
     res.json(task);
 });
 
@@ -67,7 +76,7 @@ app.get('/signup', async function (req, res) {
 // update user
 app.put('/users', async function(req, res) {
     let { body } = req;
-    let user = await User.findByIdAndUpdate( { _id: req.params.id }, body);
+    let user = await User.findByIdAndUpdate( { _id: req.params.id }, body, { new: true });
     res.json(user);
 });
 
