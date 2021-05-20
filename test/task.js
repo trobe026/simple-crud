@@ -1,85 +1,77 @@
 const chai = require('chai');
+const { before } = require('mocha');
+const mongo = require('../src/clients/mongo');
 const expect = chai.expect;
-// eslint-disable-next-line no-unused-vars
-const should = chai.should();
+const should = chai.should(); // eslint-disable-line no-unused-vars
 
-const chaiHttp = require('chai-http');
-chai.use(chaiHttp);
-
-describe('Tasks', () => {
-
-    const host = 'localhost:9000';
-    const task_id = 1;
+describe('Task Model', () => {
 
     before(async() => {
-
-        await chai.request(host)
-            .delete('/tasks/');
+        await mongo.connect('mongodb://mongo:27017');
     });
 
-    describe('GET and POST tasks', () => {
-
-        it('Should get all tasks', async() => {
-
-            let resp = await chai.request(host).get('/tasks');
-
-            resp.should.have.status(200);
-            resp.body.should.be.a('array');
-            resp.body.length.should.be.eql(0);
-        });
-
-        it('Should create a new task', async() => {
-
-            const task = {
-                title: 'test task',
-                text: 'some to-do'
-            };
-
-            let resp = await chai.request(host).post('/tasks/' + task_id).send(task);
-
-            expect(resp.status).to.equal(200);
-            resp.body.should.be.a('object');
-            expect(resp.body.title).to.equal('test task');
-            expect(resp.body.text).to.equal('some to-do');
-        });
-
-        it('Should get a task', async() => {
-
-            let resp = await chai.request(host).get('/tasks/' + task_id);
-
-            resp.should.have.status(200);
-            resp.body.should.be.a('object');
-            expect(resp.body.title).to.equal('test task');
-            expect(resp.body.text).to.equal('some to-do');
-        });
+    beforeEach(async() => {
+        await mongo.flushCollections();
     });
 
-    describe('PUT and DEL tasks', () => {
+    after(async() => {
+        await mongo.disconnect();
+    });
 
-        it('Should get update a task', async() => {
 
-            const newTask = {
-                title: 'test task',
-                text: 'updated task'
-            };
+    it('should create a task', async() => {
+        let task = await mongo.Task.create({ _id: 1, title: 'something', text: 'some task' });
 
-            let resp = await chai.request(host).put('/tasks/' + task_id).send(newTask);
+        expect(task.title).to.equal('something');
+        expect(task.text).to.equal('some task');
+    });
 
-            expect(resp.status).to.equal(200);
-            resp.body.should.be.a('object');
-            expect(resp.body.title).to.equal('test task');
-            expect(resp.body.text).to.equal('updated task');
-        });
+    it('should get a task', async() => {
+        await mongo.Task.create({ _id: 1, title: 'something', text: 'some task' });
 
-        it('Should delete a task', async() => {
+        let task = await mongo.Task.findById({ _id: 1 });
 
-            let resp = await chai.request(host).del('/tasks/' + task_id);
+        expect(task.title).to.equal('something');
+        expect(task.text).to.equal('some task');
+    });
 
-            expect(resp.status).to.equal(200);
-            resp.body.should.be.a('object');
-            expect(resp.body.ok).to.equal(1);
-            expect(resp.body.deletedCount).to.equal(1);
-        });
+    it('should get all tasks', async() => {
+        await mongo.Task.create({ _id: 1, title: 'something', text: 'some task' });
+        await mongo.Task.create({ _id: 2, title: 'groceries', text: 'get groceries?' });
+
+        let task = await mongo.Task.find({});
+
+        task.should.be.a('array');
+        task.length.should.be.eql(2);
+
+        expect(task[0].title).to.equal('something');
+        expect(task[1].text).to.equal('get groceries?');
+    });
+
+    it('should update a task', async() => {
+        await mongo.Task.create({ _id: 1, title: 'something', text: 'some task' });
+
+        let newTask = {
+            title: 'a new task',
+            text: 'do a thing'
+        };
+
+        let task = await mongo.Task.findByIdAndUpdate( { _id: 1 }, newTask, { useFindAndModify: false, new: true });
+
+        expect(task.title).to.equal('a new task');
+        expect(task.text).to.equal('do a thing');
+    });
+
+    it('should delete a task', async() => {
+        await mongo.Task.create({ _id: 1, title: 'something', text: 'some task' });
+
+        let task = await mongo.Task.deleteOne({ _id: 1 });
+        task.should.be.a('object');
+
+        expect(task.ok).to.equal(1);
+        expect(task.deletedCount).to.equal(1);
     });
 
 });
+
+
