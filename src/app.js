@@ -6,6 +6,9 @@ const userRouter = require('./routes/users');
 const app = express();
 
 app.use(express.json());
+app.use(express.urlencoded({
+    extended: true
+}));
 
 const mainRouter = express.Router();
 

@@ -17,9 +17,11 @@ router.get('/:id', async function(req, res) {
     res.json(task);
 });
 
-// create a task and link to the user
+// create a task
 router.post('/:id', async function(req, res) {
+    console.log('ran');
     let { body } = req;
+    console.log(body);
     let task = await Task.create( { _id: req.params.id, title: body.title, text: body.text });
     res.json(task);
 });
