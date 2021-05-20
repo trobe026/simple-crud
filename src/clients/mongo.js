@@ -7,16 +7,13 @@ let connected;
 async function connect(host) {
     if (!connected) {
         try {
-            console.log('trying to connect...');
             await mongoose.connect(host, { useNewUrlParser: true, useUnifiedTopology: true, useCreateIndex: true  });
 
         } catch (e) {
             console.log(e);
         }
-        console.log('connected');
         connected = true;
     }
-    console.log('already connected');
     return;
 }
 
