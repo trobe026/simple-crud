@@ -1,6 +1,6 @@
 const chai = require('chai');
 const { before } = require('mocha');
-const mongo = require('../src/clients/mongo');
+const mongo = require('../../src/clients/mongo');
 const expect = chai.expect;
 const should = chai.should(); // eslint-disable-line no-unused-vars
 
