@@ -3,6 +3,7 @@ const { before } = require('mocha');
 const mongo = require('../../src/clients/mongo');
 const expect = chai.expect;
 const should = chai.should(); // eslint-disable-line no-unused-vars
+const { createTask } = require('../utils');
 
 describe('Task Model', () => {
 
@@ -20,14 +21,14 @@ describe('Task Model', () => {
 
 
     it('should create a task', async() => {
-        let task = await mongo.Task.create({ _id: 1, title: 'something', text: 'some task' });
+        let task = await createTask(1, 'something', 'some task');
 
         expect(task.title).to.equal('something');
         expect(task.text).to.equal('some task');
     });
 
     it('should get a task', async() => {
-        await mongo.Task.create({ _id: 1, title: 'something', text: 'some task' });
+        await createTask(1, 'something', 'some task');
 
         let task = await mongo.Task.findById({ _id: 1 });
 
@@ -36,8 +37,8 @@ describe('Task Model', () => {
     });
 
     it('should get all tasks', async() => {
-        await mongo.Task.create({ _id: 1, title: 'something', text: 'some task' });
-        await mongo.Task.create({ _id: 2, title: 'groceries', text: 'get groceries?' });
+        await createTask(1, 'something', 'some task');
+        await createTask(2, 'groceries', 'get groceries?');
 
         let task = await mongo.Task.find({});
 
@@ -49,7 +50,7 @@ describe('Task Model', () => {
     });
 
     it('should update a task', async() => {
-        await mongo.Task.create({ _id: 1, title: 'something', text: 'some task' });
+        await createTask(1, 'something', 'some task');
 
         let newTask = {
             title: 'a new task',
@@ -63,7 +64,7 @@ describe('Task Model', () => {
     });
 
     it('should delete a task', async() => {
-        await mongo.Task.create({ _id: 1, title: 'something', text: 'some task' });
+        await createTask(1, 'something', 'some task');
 
         let task = await mongo.Task.deleteOne({ _id: 1 });
         task.should.be.a('object');
