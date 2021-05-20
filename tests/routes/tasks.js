@@ -1,8 +1,21 @@
 const chai = require('chai');
+const mongo = require('../../src/clients/mongo');
 
 const { createTask } = require('../utils');
 
 describe('Tasks API', () => {
+
+    before(async() => {
+        await mongo.connect('mongodb://mongo:27017');
+    });
+
+    beforeEach(async() => {
+        await mongo.flushCollections();
+    });
+
+    after(async() => {
+        await mongo.disconnect();
+    });
 
     describe('/GET tasks', () => {
 
