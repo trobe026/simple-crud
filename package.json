@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "mocha --timeout 10000 --recursive --require tests/hooks.js"
+    "test": "mocha tests/ --timeout 10000 --recursive --require tests/hooks.js"
   },
   "keywords": [],
   "author": "",
@@ -20,6 +20,7 @@
     "mongoose": "^5.12.8",
     "nodemon": "^2.0.7",
     "passport": "^0.4.1",
-    "sinon": "^10.0.0"
+    "sinon": "^10.0.0",
+    "supertest": "^6.1.3"
   }
 }
